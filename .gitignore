@@ -1,0 +1,5 @@
+node_modules/
+.env
+state/
+form-meta.json
+*.png

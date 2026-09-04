@@ -1,0 +1,27 @@
+{
+  "name": "journal-bot",
+  "version": "1.0.0",
+  "description": "Drafts and auto-submits the Kalvium Simulated Work Daily Journal from real GitHub activity.",
+  "type": "module",
+  "bin": {
+    "journal-bot": "./src/index.js"
+  },
+  "scripts": {
+    "login": "node bin/login.js",
+    "discover": "node bin/discover.js",
+    "run": "node src/index.js",
+    "dry": "node src/index.js --dry-run",
+    "schedule": "bash bin/install-schedule.sh",
+    "models": "node bin/models.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.0",
+    "@google/genai": "^2.21.0",
+    "nodemailer": "^9.1.1",
+    "playwright": "^1.49.0",
+    "zod": "^4.5.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

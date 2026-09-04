@@ -1,0 +1,45 @@
+{
+  "githubLogin": "abhinavravishankar112",
+  "repo": "",
+  "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSc8RRUAG8n8nPB9dm21m_MxwHQ-JuDnEj7GnvwEkWXykkKFuQ/viewform",
+  "googleAccount": "abhinavravi.shankar.s.112@kalvium.community",
+  "questions": {
+    "workingDay": "was today a working day for you",
+    "keyTasks": "What were your key tasks for the day",
+    "solved": "What challenges/problems did you solve today",
+    "unsolved": "What challenges/problems you were NOT able to solve today",
+    "plan": "What is your plan for the next day of Simulated Work"
+  },
+  "answers": {
+    "present": "It was a working day, and I was present"
+  },
+  "provider": "gemini",
+  "models": {
+    "gemini": "gemini-3.8-flash",
+    "anthropic": "claude-opus-5"
+  },
+  "fallbackModels": {
+    "gemini": [
+      "gemini-3.5-flash",
+      "gemini-2.5-flash"
+    ],
+    "anthropic": [
+      "claude-sonnet-5"
+    ]
+  },
+  "notifyEmail": "",
+  "schedule": {
+    "hour": 21,
+    "minute": 15
+  },
+  "skipWeekdays": [
+    0
+  ],
+  "holidays": [],
+  "onNoActivity": "skip",
+  "fetchCommitDetail": true,
+  "maxCommitDetail": 25,
+  "browserChannel": "chrome",
+  "headless": true,
+  "screenshotReceipt": true
+}
