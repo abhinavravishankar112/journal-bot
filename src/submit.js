@@ -53,16 +53,19 @@ export async function submitJournal(answers, { dryRun = false } = {}) {
     await page.waitForTimeout(1500);
     await assertSignedIn(page);
 
+    const submitBtn = page.getByRole("button", { name: "Submit", exact: true });
+    const nextBtn = page.getByRole("button", { name: "Next", exact: true });
+
     for (let step = 0; step < 8; step++) {
+      // A CI runner renders each section noticeably slower than a laptop; checking
+      // visibility straight after navigation reads a half-drawn page as "no buttons".
+      await submitBtn.or(nextBtn).first().waitFor({ state: "visible", timeout: 20000 }).catch(() => {});
       await tickEmailConsentIfPresent(page);
       if (await chooseIfPresent(page, Q.workingDay, config.answers.present)) filled.add("workingDay");
       if (await fillIfPresent(page, Q.keyTasks, answers.key_tasks)) filled.add("keyTasks");
       if (await fillIfPresent(page, Q.solved, answers.solved)) filled.add("solved");
       if (await fillIfPresent(page, Q.unsolved, answers.unsolved)) filled.add("unsolved");
       if (await fillIfPresent(page, Q.plan, answers.plan)) filled.add("plan");
-
-      const submitBtn = page.getByRole("button", { name: "Submit", exact: true });
-      const nextBtn = page.getByRole("button", { name: "Next", exact: true });
 
       if (await submitBtn.isVisible().catch(() => false)) {
         const missing = Object.keys(Q).filter((k) => !filled.has(k));
@@ -94,7 +97,13 @@ export async function submitJournal(answers, { dryRun = false } = {}) {
         continue;
       }
 
-      throw new Error("No Next or Submit button found — the form layout is not what was expected.");
+      const err = new Error(
+        "No Next or Submit button found — the form layout is not what was expected. " +
+          "The attached screenshot shows the page it stopped on."
+      );
+      err.screenshot = path.join(STATE_DIR, "failure.png");
+      await page.screenshot({ path: err.screenshot, fullPage: true }).catch(() => (err.screenshot = null));
+      throw err;
     }
     throw new Error("Walked 8 pages without reaching Submit; aborting rather than looping.");
   } finally {

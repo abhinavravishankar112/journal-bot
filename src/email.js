@@ -73,7 +73,7 @@ export function sendReceipt({ date, answers, activity, submitted, screenshot }) 
   return send({ subject, html, text, screenshot });
 }
 
-export function sendAlert(subject, message) {
+export function sendAlert(subject, message, screenshot) {
   return send({
     subject,
     html: wrap(
@@ -82,5 +82,6 @@ export function sendAlert(subject, message) {
         `<p style="margin:0"><a href="${esc(config.formUrl)}">Open the journal form</a></p>`
     ),
     text: `${subject}\n\n${message}\n\n${config.formUrl}`,
+    screenshot,
   });
 }

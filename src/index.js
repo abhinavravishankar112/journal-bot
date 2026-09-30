@@ -73,7 +73,8 @@ main().catch(async (err) => {
   console.error(err);
   await sendAlert(
     `🚨 Journal bot failed — ${today().date}`,
-    `${String(err.message).slice(0, 900)}\n\nFill the form manually so you don't lose the mark.`
+    `${String(err.message).slice(0, 900)}\n\nFill the form manually so you don't lose the mark.`,
+    err.screenshot
   ).catch(() => {});
   process.exit(1);
 });
