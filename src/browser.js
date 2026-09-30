@@ -17,11 +17,6 @@ export async function launch({ headless = config.headless } = {}) {
     viewport: { width: 1280, height: 1000 },
     args: ["--disable-blink-features=AutomationControlled"],
   });
-  // On a CI runner the profile starts empty; the Google session arrives as cookies
-  // exported from the signed-in laptop profile by `npm run export-session`.
-  if (process.env.GOOGLE_SESSION) {
-    await context.addCookies(JSON.parse(process.env.GOOGLE_SESSION));
-  }
   const page = context.pages()[0] || (await context.newPage());
   return { context, page };
 }

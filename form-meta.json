@@ -1,0 +1,58 @@
+{
+  "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSc8RRUAG8n8nPB9dm21m_MxwHQ-JuDnEj7GnvwEkWXykkKFuQ/viewform",
+  "questions": [
+    {
+      "title": "A confirmation to start with - was today a working day for you?",
+      "type": "radio",
+      "entryId": "entry.187493348",
+      "required": true,
+      "options": [
+        "It was a campus holiday",
+        "It was a working day, and I was present",
+        "It was a working day, but I was on leave or absent"
+      ]
+    },
+    {
+      "title": "About today",
+      "type": "type 8",
+      "entryId": null,
+      "required": false,
+      "options": []
+    },
+    {
+      "title": "What were your key tasks for the day?",
+      "type": "paragraph",
+      "entryId": "entry.32162408",
+      "required": true,
+      "options": []
+    },
+    {
+      "title": "What challenges/problems did you solve today?",
+      "type": "paragraph",
+      "entryId": "entry.1874357572",
+      "required": true,
+      "options": []
+    },
+    {
+      "title": "What challenges/problems you were NOT able to solve today and are planning to solve in upcoming days?",
+      "type": "paragraph",
+      "entryId": "entry.199221807",
+      "required": true,
+      "options": []
+    },
+    {
+      "title": "What is your plan for the next day of Simulated Work?",
+      "type": "paragraph",
+      "entryId": "entry.1546753981",
+      "required": true,
+      "options": []
+    },
+    {
+      "title": "Thank you for filling today's journal",
+      "type": "type 8",
+      "entryId": null,
+      "required": false,
+      "options": []
+    }
+  ]
+}

@@ -24,7 +24,7 @@ npm run discover            # print live form questions + validate config.json a
 npm run dry                 # full run, walks to Submit, screenshots, does NOT click
 npm run run                 # real run
 npm run schedule            # (re)install the launchd agent from config.json's schedule block
-npm run export-session      # export the Google session cookies for the GitHub Actions run
+node src/index.js --link    # draft, then email a prefilled form link instead of submitting
 node src/index.js --force   # ignore the already-submitted guard, holidays, and skipWeekdays
 ```
 
@@ -32,10 +32,12 @@ There are no tests, no linter, and no build. To verify a change, use `npm run dr
 GitHub collection, the model call, and the whole form walk, stopping one click short of submitting.
 For form-selector work specifically, set `"headless": false` in `config.json` to watch it drive.
 
-The alternative to launchd is `.github/workflows/journal.yml` (21:00 IST, `TZ=Asia/Kolkata`).
-The runner's Chrome profile starts empty, so `browser.js` seeds it from the `GOOGLE_SESSION`
-secret — Google cookies exported by `npm run export-session`. The double-submit log is carried
-between runs in the Actions cache. The repo is public, so nothing may print journal text to stdout.
+The alternative to launchd is `.github/workflows/journal.yml` (21:00 IST, `TZ=Asia/Kolkata`),
+which runs `--link`: `prefill.js` builds a prefilled viewform URL from the entry IDs in
+`form-meta.json` (committed for this reason) and emails it, and the user presses Submit. It never
+signs into Google — cookies exported to a runner were revoked by Google within minutes, taking the
+laptop session with them. Don't reintroduce that. The repo is public, so nothing may print journal
+text to stdout.
 
 launchd logs land in `state/launchd.{out,err}.log`; `launchctl start com.journalbot.daily` fires a
 run immediately.
@@ -94,8 +96,8 @@ click), and the requirement to use the real Chrome binary via `channel: "chrome"
 sign-in on Playwright's bundled Chromium.
 
 **`bin/discover.js`** parses `FB_PUBLIC_LOAD_DATA_` out of the page to enumerate questions, types,
-options, and `entry.` IDs. The entry IDs are written to `form-meta.json` for validation only —
-submission deliberately drives the real DOM instead, which is what keeps Google's recorded-email and
+options, and `entry.` IDs. The entry IDs are written to `form-meta.json` for validation and for `--link`'s prefilled URL —
+automated submission deliberately drives the real DOM instead, which is what keeps Google's recorded-email and
 response-copy behaviour intact. Don't "optimise" this into a direct POST.
 
 **`email.js`** sends via Gmail with an App Password, or prints to the console when unset. `send()`

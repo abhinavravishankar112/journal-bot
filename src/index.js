@@ -5,11 +5,13 @@ import { config, today, shouldSkipToday, STATE_DIR } from "./config.js";
 import { collectActivity } from "./github.js";
 import { draftJournal } from "./draft.js";
 import { submitJournal } from "./submit.js";
-import { sendReceipt, sendAlert } from "./email.js";
+import { prefillUrl } from "./prefill.js";
+import { sendReceipt, sendAlert, sendPrefill } from "./email.js";
 
 const LOG = path.join(STATE_DIR, "submissions.json");
 const dryRun = process.argv.includes("--dry-run");
 const force = process.argv.includes("--force");
+const linkOnly = process.argv.includes("--link");
 
 const readLog = () => (fs.existsSync(LOG) ? JSON.parse(fs.readFileSync(LOG, "utf8")) : {});
 const writeLog = (log) => fs.writeFileSync(LOG, JSON.stringify(log, null, 2));
@@ -50,6 +52,14 @@ async function main() {
 
   console.log("Drafting…");
   const answers = await draftJournal(activity, day.date);
+
+  if (linkOnly) {
+    // The email is the only output of this mode, so unlike a receipt its failure is fatal.
+    const sent = await sendPrefill({ date: day.date, answers, activity, url: prefillUrl(answers) });
+    if (!sent) throw new Error("Could not email the prefilled link. Check GMAIL_USER / GMAIL_APP_PASSWORD.");
+    console.log("Prefilled link emailed (nothing submitted).");
+    return;
+  }
 
   console.log(dryRun ? "Dry run — walking the form without submitting…" : "Submitting…");
   const result = await submitJournal(answers, { dryRun });

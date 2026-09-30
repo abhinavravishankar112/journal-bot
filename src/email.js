@@ -47,11 +47,14 @@ const field = (label, value) =>
   `<p style="margin:18px 0 4px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#888">${label}</p>` +
   `<p style="margin:0">${esc(value)}</p>`;
 
+const statsLine = (activity) =>
+  `${activity.commits.length} commits · ${activity.pullRequests.length} PR events · ${activity.reviews.length} reviews · ${activity.openPrs.length} open PRs`;
+
 export function sendReceipt({ date, answers, activity, submitted, screenshot }) {
   const subject = submitted
     ? `✅ Journal submitted — ${date}`
     : `📝 Journal draft (dry run, not submitted) — ${date}`;
-  const stats = `${activity.commits.length} commits · ${activity.pullRequests.length} PR events · ${activity.reviews.length} reviews · ${activity.openPrs.length} open PRs`;
+  const stats = statsLine(activity);
 
   const html = wrap(
     `<h2 style="margin:0 0 4px;font-size:18px">${submitted ? "Journal submitted" : "Journal draft — not submitted"}</h2>` +
@@ -71,6 +74,28 @@ export function sendReceipt({ date, answers, activity, submitted, screenshot }) 
   ].join("\n");
 
   return send({ subject, html, text, screenshot });
+}
+
+export function sendPrefill({ date, answers, activity, url }) {
+  const subject = `📝 Journal ready — tap to submit — ${date}`;
+  const html = wrap(
+    `<h2 style="margin:0 0 4px;font-size:18px">Today's journal is drafted</h2>` +
+      `<p style="margin:0;color:#888;font-size:13px">${esc(date)} · ${esc(statsLine(activity))}</p>` +
+      `<p style="margin:20px 0"><a href="${esc(url)}" style="display:inline-block;padding:12px 20px;background:#1a73e8;color:#fff;border-radius:6px;text-decoration:none;font-weight:600">Open the prefilled form</a></p>` +
+      `<p style="margin:0;color:#555;font-size:13px">Tick the email checkbox, read through each section, then press Submit.</p>` +
+      field("Key tasks", answers.key_tasks) +
+      field("Solved", answers.solved) +
+      field("Still open", answers.unsolved) +
+      field("Plan", answers.plan)
+  );
+  const text = [
+    subject, statsLine(activity), "", url, "",
+    `KEY TASKS\n${answers.key_tasks}`, "",
+    `SOLVED\n${answers.solved}`, "",
+    `STILL OPEN\n${answers.unsolved}`, "",
+    `PLAN\n${answers.plan}`,
+  ].join("\n");
+  return send({ subject, html, text });
 }
 
 export function sendAlert(subject, message, screenshot) {

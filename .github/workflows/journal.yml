@@ -1,14 +1,11 @@
 name: Daily journal
 
+# Drafts today's journal and emails a prefilled form link. It never signs into
+# Google: a session exported to a datacenter IP was revoked by Google within minutes.
 on:
   schedule:
     - cron: "30 15 * * *" # 21:00 IST
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: Walk to Submit without clicking
-        type: boolean
-        default: true
 
 permissions:
   actions: write
@@ -19,8 +16,8 @@ concurrency:
 
 jobs:
   journal:
-    runs-on: ubuntu-latest # Google Chrome is preinstalled, which channel: "chrome" needs
-    timeout-minutes: 20
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     env:
       TZ: Asia/Kolkata # today() and holidays are local dates
       PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
@@ -28,7 +25,6 @@ jobs:
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       GMAIL_USER: ${{ secrets.GMAIL_USER }}
       GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
-      GOOGLE_SESSION: ${{ secrets.GOOGLE_SESSION }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,26 +35,12 @@ jobs:
       # Without Gmail the journal falls back to printing on stdout — public logs on this repo.
       - name: Require secrets
         run: |
-          for s in GH_TOKEN GEMINI_API_KEY GMAIL_USER GMAIL_APP_PASSWORD GOOGLE_SESSION; do
+          for s in GH_TOKEN GEMINI_API_KEY GMAIL_USER GMAIL_APP_PASSWORD; do
             [ -n "${!s}" ] || { echo "::error::Missing secret for $s — see README 'Running remotely'"; exit 1; }
           done
 
       - run: npm ci
-
-      # The runner is fresh every day; the cache carries the double-submit guard across runs.
-      - uses: actions/cache/restore@v4
-        with:
-          path: state/submissions.json
-          key: submissions-${{ github.run_id }}
-          restore-keys: submissions-
-
-      - run: node src/index.js ${{ inputs.dry_run && '--dry-run' || '' }}
-
-      - uses: actions/cache/save@v4
-        if: always() && hashFiles('state/submissions.json') != ''
-        with:
-          path: state/submissions.json
-          key: submissions-${{ github.run_id }}
+      - run: node src/index.js --link
 
       # GitHub disables scheduled workflows after 60 days without repo activity.
       - name: Keep the schedule alive
