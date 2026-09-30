@@ -102,6 +102,27 @@ than cron because it catches up on a run missed while the Mac was asleep. It onl
 while you are logged in — if the laptop is shut at 21:15, the run happens at the next wake,
 which still counts as long as that is before midnight.
 
+## Running remotely (GitHub Actions)
+
+Instead of launchd, [.github/workflows/journal.yml](.github/workflows/journal.yml) runs the
+bot on GitHub's servers every day at 21:00 IST, so the laptop can be off. Use one or the
+other, never both — each keeps its own double-submit guard.
+
+It needs five repository secrets:
+
+| Secret | Value |
+| --- | --- |
+| `GOOGLE_SESSION` | `npm run export-session`, then `gh secret set GOOGLE_SESSION < ~/.journal-bot/google-session.json && rm ~/.journal-bot/google-session.json` |
+| `GH_PAT` | A classic token with `repo` scope ([create one](https://github.com/settings/tokens/new?scopes=repo&description=journal-bot)). The workflow's own token can't read your event feed. |
+| `GEMINI_API_KEY`, `GMAIL_USER`, `GMAIL_APP_PASSWORD` | Same as `.env`. Gmail is required here: without it the journal would print to the public Actions log. |
+
+Test it from the Actions tab → *Daily journal* → *Run workflow* (dry run is ticked by
+default); the screenshot arrives by email.
+
+If a run fails with "not signed into Google", Google has expired or rejected the exported
+session. Run `npm run login`, then `npm run export-session` and re-upload the secret.
+GitHub's cron can also start 5–30 minutes late under load.
+
 ## Running it by hand
 
 ```bash

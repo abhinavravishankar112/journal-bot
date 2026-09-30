@@ -24,12 +24,18 @@ npm run discover            # print live form questions + validate config.json a
 npm run dry                 # full run, walks to Submit, screenshots, does NOT click
 npm run run                 # real run
 npm run schedule            # (re)install the launchd agent from config.json's schedule block
+npm run export-session      # export the Google session cookies for the GitHub Actions run
 node src/index.js --force   # ignore the already-submitted guard, holidays, and skipWeekdays
 ```
 
 There are no tests, no linter, and no build. To verify a change, use `npm run dry` — it exercises
 GitHub collection, the model call, and the whole form walk, stopping one click short of submitting.
 For form-selector work specifically, set `"headless": false` in `config.json` to watch it drive.
+
+The alternative to launchd is `.github/workflows/journal.yml` (21:00 IST, `TZ=Asia/Kolkata`).
+The runner's Chrome profile starts empty, so `browser.js` seeds it from the `GOOGLE_SESSION`
+secret — Google cookies exported by `npm run export-session`. The double-submit log is carried
+between runs in the Actions cache. The repo is public, so nothing may print journal text to stdout.
 
 launchd logs land in `state/launchd.{out,err}.log`; `launchctl start com.journalbot.daily` fires a
 run immediately.

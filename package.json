@@ -12,7 +12,8 @@
     "run": "node src/index.js",
     "dry": "node src/index.js --dry-run",
     "schedule": "bash bin/install-schedule.sh",
-    "models": "node bin/models.js"
+    "models": "node bin/models.js",
+    "export-session": "node bin/export-session.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.0",
