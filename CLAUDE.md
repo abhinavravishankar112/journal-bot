@@ -32,8 +32,8 @@ There are no tests, no linter, and no build. To verify a change, use `npm run dr
 GitHub collection, the model call, and the whole form walk, stopping one click short of submitting.
 For form-selector work specifically, set `"headless": false` in `config.json` to watch it drive.
 
-The alternative to launchd is `.github/workflows/journal.yml` (21:05–22:35 IST, `TZ=Asia/Kolkata`;
-four crons because GitHub starts them hours late, deduped by its gate step),
+The alternative to launchd is `.github/workflows/journal.yml` (18:05–21:05 IST, `TZ=Asia/Kolkata`;
+five crons because GitHub starts them hours late, deduped by its gate step),
 which runs `--link`: `prefill.js` builds a prefilled viewform URL from the entry IDs in
 `form-meta.json` (committed for this reason) and emails it, and the user presses Submit. It never
 signs into Google — cookies exported to a runner were revoked by Google within minutes, taking the

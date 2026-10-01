@@ -7,10 +7,11 @@ on:
   # midnight IST. Several attempts give one a chance to land on time; the gate
   # step below makes every attempt after the first a no-op.
   schedule:
+    - cron: "35 12 * * *" # 18:05 IST
+    - cron: "5 13 * * *" # 18:35 IST
+    - cron: "35 13 * * *" # 19:05 IST
+    - cron: "35 14 * * *" # 20:05 IST
     - cron: "35 15 * * *" # 21:05 IST
-    - cron: "5 16 * * *" # 21:35 IST
-    - cron: "35 16 * * *" # 22:05 IST
-    - cron: "5 17 * * *" # 22:35 IST
   workflow_dispatch:
 
 permissions:

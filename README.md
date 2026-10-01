@@ -105,7 +105,7 @@ which still counts as long as that is before midnight.
 ## Running remotely (GitHub Actions)
 
 [.github/workflows/journal.yml](.github/workflows/journal.yml) runs on GitHub's servers every
-day at 21:00 IST, so the laptop can be off. It collects the day's activity and drafts the
+evening from 18:05 IST, so the laptop can be off. It collects the day's activity and drafts the
 answers as usual, but it **does not submit**. Instead it emails you a link to the form with
 every answer prefilled. Open it signed in, tick the email checkbox, read through, and press
 Submit.
@@ -121,7 +121,7 @@ fallback would print the journal to the public Actions log.
 The link is built from the question IDs in `form-meta.json`, which is committed for this
 reason. If the form changes, run `npm run discover` and commit the updated file. Test from
 the Actions tab → *Daily journal* → *Run workflow*. GitHub starts scheduled runs late under
-load (once by over 4 hours), so it tries at 21:05, 21:35, 22:05 and 22:35 IST; the first
+load (once by over 4 hours), so it tries at 18:05, 18:35, 19:05, 20:05 and 21:05 IST; the first
 to run sends the link and the rest stop. A run that starts after midnight emails you that it
 was too late instead of journaling the wrong day.
 
