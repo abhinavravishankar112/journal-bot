@@ -120,8 +120,10 @@ fallback would print the journal to the public Actions log.
 
 The link is built from the question IDs in `form-meta.json`, which is committed for this
 reason. If the form changes, run `npm run discover` and commit the updated file. Test from
-the Actions tab → *Daily journal* → *Run workflow*. GitHub's cron can start 5–30 minutes
-late.
+the Actions tab → *Daily journal* → *Run workflow*. GitHub starts scheduled runs late under
+load (once by over 4 hours), so it tries at 21:05, 21:35, 22:05 and 22:35 IST; the first
+to run sends the link and the rest stop. A run that starts after midnight emails you that it
+was too late instead of journaling the wrong day.
 
 To get the link locally: `node src/index.js --link`.
 

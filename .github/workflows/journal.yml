@@ -3,8 +3,14 @@ name: Daily journal
 # Drafts today's journal and emails a prefilled form link. It never signs into
 # Google: a session exported to a datacenter IP was revoked by Google within minutes.
 on:
+  # GitHub starts scheduled runs late under load — one started 4h40m late, past
+  # midnight IST. Several attempts give one a chance to land on time; the gate
+  # step below makes every attempt after the first a no-op.
   schedule:
-    - cron: "30 15 * * *" # 21:00 IST
+    - cron: "35 15 * * *" # 21:05 IST
+    - cron: "5 16 * * *" # 21:35 IST
+    - cron: "35 16 * * *" # 22:05 IST
+    - cron: "5 17 * * *" # 22:35 IST
   workflow_dispatch:
 
 permissions:
@@ -40,7 +46,37 @@ jobs:
           done
 
       - run: npm ci
-      - run: node src/index.js --link
+
+      - name: Gate scheduled runs
+        id: gate
+        if: github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$(date +%H)" -lt 12 ]; then
+            echo "late=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # Evening runs only: a late run after midnight is dated the same day but sent nothing.
+          done_today=$(gh run list -R "$GITHUB_REPOSITORY" --workflow journal.yml --event schedule \
+            --status success -L 20 --json createdAt \
+            -q "[.[] | .createdAt | fromdateiso8601 + 19800 | strftime(\"%Y-%m-%d %H\")
+                | select(startswith(\"$(date +%F)\") and (.[11:13] | tonumber) >= 12)] | length")
+          [ "$done_today" -gt 0 ] && echo "done=true" >> "$GITHUB_OUTPUT" || true
+
+      - name: Alert that the run started after midnight
+        if: steps.gate.outputs.late == 'true'
+        run: |
+          node --input-type=module -e '
+            import { sendAlert } from "./src/email.js";
+            await sendAlert(
+              `⚠️ Journal bot ran too late — GitHub started it at ${new Date().toTimeString().slice(0, 5)} IST`,
+              "GitHub delayed every scheduled run past midnight, so no link was sent for yesterday. " +
+                "If you have not filled yesterday'"'"'s journal, do it now from the form."
+            );'
+
+      - if: steps.gate.outputs.late != 'true' && steps.gate.outputs.done != 'true'
+        run: node src/index.js --link
 
       # GitHub disables scheduled workflows after 60 days without repo activity.
       - name: Keep the schedule alive
